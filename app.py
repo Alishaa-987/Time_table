@@ -15,6 +15,15 @@ def set_bg_image(image_url):
             height: 100vh;
             color: white;
         }}
+        h1, h2, h3 {{
+            font-family: 'Courier New', Courier, monospace;  /* Stylish Font */
+        }}
+        .stTextInput, .stTextArea, .stSelectbox, .stDateInput {{
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 10px; /* Rounded boxes */
+            padding: 10px;
+            font-size: 16px;
+        }}
         </style>
         """,
         unsafe_allow_html=True
@@ -47,15 +56,15 @@ if 'classes' not in st.session_state:
 # Form for adding class details
 for i in range(num_classes):
     with st.form(key=f'class_form_{i}'):
-        class_name = st.text_input(f"Class Name {i + 1}")
-        topics = st.text_area(f"Topics for {class_name} (comma-separated)")
-        deadline = st.date_input(f"Assignment Deadline for {class_name}")
-        priority = st.selectbox(f"Priority for {class_name}", ["High", "Medium", "Low"])
-        
+        class_name = st.text_input(f"Class Name {i + 1}", key=f'class_name_{i}')
+        topics = st.text_area(f"Topics for {class_name} (comma-separated)", key=f'topics_{i}')
+        deadline = st.date_input(f"Assignment Deadline for {class_name}", key=f'deadline_{i}')
+        priority = st.selectbox(f"Priority for {class_name}", ["High", "Medium", "Low"], key=f'priority_{i}')
+
         # Submit button
         submit_button = st.form_submit_button(label="Add Class")
-        
-        # If user clicks the submit button
+
+        # Change color and clear input on submit
         if submit_button:
             if class_name and topics:  # Ensure inputs are not empty
                 st.session_state.classes.append({
@@ -65,6 +74,21 @@ for i in range(num_classes):
                     "Priority": priority
                 })
                 st.success(f"Added: {class_name} with topics {topics}")
+
+                # Clear inputs
+                st.experimental_rerun()
+
+# Ask for assignments or quizzes
+if st.session_state.classes:
+    st.header("Additional Tasks")
+    for cls in st.session_state.classes:
+        with st.expander(cls["Class Name"]):
+            has_assignment = st.radio(f"Is there an assignment or quiz for {cls['Class Name']}?", 
+                                      ["Yes", "No"], key=f'has_assignment_{cls["Class Name"]}')
+
+            if has_assignment == "Yes":
+                assignment_deadline = st.date_input(f"Assignment/Quiz Deadline for {cls['Class Name']}", key=f'assignment_deadline_{cls["Class Name"]}')
+                st.session_state.classes[-1]["Assignment Deadline"] = assignment_deadline
 
 # Display the timetable if classes have been added
 if st.session_state.classes:
