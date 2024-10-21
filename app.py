@@ -13,16 +13,29 @@ def set_bg_image(image_url):
             background-position: center;
             background-repeat: no-repeat;
             height: 100vh;
-            color: white;
+            color: #fff;
+            font-family: 'Arial', sans-serif;
         }}
         h1, h2, h3 {{
             font-family: 'Courier New', Courier, monospace;  /* Stylish Font */
         }}
         .stTextInput, .stTextArea, .stSelectbox, .stDateInput {{
-            background-color: rgba(255, 255, 255, 0.9);
+            background-color: rgba(255, 255, 255, 0.8);
             border-radius: 10px; /* Rounded boxes */
             padding: 10px;
             font-size: 16px;
+            border: 2px solid #4CAF50; /* Green border */
+        }}
+        .stButton {{
+            background-color: #4CAF50; /* Green */
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            border: none;
+            cursor: pointer;
+        }}
+        .stButton:hover {{
+            background-color: #45a049; /* Darker green */
         }}
         </style>
         """,
@@ -56,15 +69,15 @@ if 'classes' not in st.session_state:
 # Form for adding class details
 for i in range(num_classes):
     with st.form(key=f'class_form_{i}'):
-        class_name = st.text_input(f"Class Name {i + 1}", key=f'class_name_{i}')
-        topics = st.text_area(f"Topics for {class_name} (comma-separated)", key=f'topics_{i}')
-        deadline = st.date_input(f"Assignment Deadline for {class_name}", key=f'deadline_{i}')
-        priority = st.selectbox(f"Priority for {class_name}", ["High", "Medium", "Low"], key=f'priority_{i}')
-
+        class_name = st.text_input(f"Class Name {i + 1}")
+        topics = st.text_area(f"Topics for {class_name} (comma-separated)")
+        deadline = st.date_input(f"Assignment Deadline for {class_name}")
+        priority = st.selectbox(f"Priority for {class_name}", ["High", "Medium", "Low"])
+        
         # Submit button
         submit_button = st.form_submit_button(label="Add Class")
-
-        # Change color and clear input on submit
+        
+        # If user clicks the submit button
         if submit_button:
             if class_name and topics:  # Ensure inputs are not empty
                 st.session_state.classes.append({
@@ -74,9 +87,6 @@ for i in range(num_classes):
                     "Priority": priority
                 })
                 st.success(f"Added: {class_name} with topics {topics}")
-
-                # Clear inputs
-                st.experimental_rerun()
 
 # Ask for assignments or quizzes
 if st.session_state.classes:
@@ -94,7 +104,7 @@ if st.session_state.classes:
 if st.session_state.classes:
     st.header("Your Timetable")
     timetable_df = pd.DataFrame(st.session_state.classes)
-    st.dataframe(timetable_df)
+    st.dataframe(timetable_df.style.set_table_attributes('style="color: black; background-color: rgba(255, 255, 255, 0.8);"'))
 
     # Calculate suggested times to complete assignments based on deadlines
     st.header("Suggested Times to Complete Assignments")
